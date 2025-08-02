@@ -25,23 +25,23 @@ type SaunaInfo struct {
 	HasSleepRoom bool
 }
 
-func NewSaunaFacility(id SaunaFacilityID, name, address, imageUrl string, price int, saunaInfo SaunaInfo) (*SaunaFacility, error) {
+func NewSaunaFacility(params SaunaFacility) (*SaunaFacility, error) {
 	// nameとageは必須入力
-	if name == "" || address == "" {
+	if params.Name == "" || params.Address == "" {
 		return nil, errors.New("名前・住所は必須です")
 	}
 
-	if price < 0 {
+	if params.Price < 0 {
 		return nil, errors.New("値段は正の数が必要になります")
 	}
 
 	return &SaunaFacility{
-		ID:        id,
-		Name:      name,
-		Address:   address,
-		Price:     price,
-		ImageURL:  imageUrl,
-		SaunaInfo: saunaInfo,
+		ID:        params.ID,
+		Name:      params.Name,
+		Address:   params.Address,
+		Price:     params.Price,
+		ImageURL:  params.ImageURL,
+		SaunaInfo: params.SaunaInfo,
 		CreatedAt: time.Now(),
 	}, nil
 }
