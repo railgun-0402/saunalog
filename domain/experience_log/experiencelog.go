@@ -35,6 +35,7 @@ func NewExperienceLog(params ExperienceLog) (*ExperienceLog, error) {
 
 	// 他にもルールがあればここで追加
 	return &ExperienceLog{
+		ID:              params.ID,
 		UserID:          params.UserID,
 		SaunaFacilityID: params.SaunaFacilityID,
 		Date:            time.Now(),
