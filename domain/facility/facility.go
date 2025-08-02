@@ -1,5 +1,10 @@
 package domain
 
+import (
+	"errors"
+	"time"
+)
+
 type SaunaFacilityID string
 
 type SaunaFacility struct {
@@ -9,7 +14,7 @@ type SaunaFacility struct {
 	Price     int
 	ImageURL  string
 	SaunaInfo SaunaInfo
-	CreatedAt int64
+	CreatedAt time.Time
 }
 
 type SaunaInfo struct {
@@ -18,4 +23,43 @@ type SaunaInfo struct {
 	HasMeal      bool
 	HasRestArea  bool
 	HasSleepRoom bool
+}
+
+func NewSaunaFacility(id SaunaFacilityID, name, address, imageUrl string, price int, saunaInfo SaunaInfo) (*SaunaFacility, error) {
+	// nameとageは必須入力
+	if name == "" || address == "" {
+		return nil, errors.New("名前・住所は必須です")
+	}
+
+	if price < 0 {
+		return nil, errors.New("値段は正の数が必要になります")
+	}
+
+	return &SaunaFacility{
+		ID:        id,
+		Name:      name,
+		Address:   address,
+		Price:     price,
+		ImageURL:  imageUrl,
+		SaunaInfo: saunaInfo,
+		CreatedAt: time.Now(),
+	}, nil
+}
+
+func NewSaunaInfo(temperature, water int, hasMeal, hasRestArea, hasSleepRoom bool) (*SaunaInfo, error) {
+	if temperature < -20 || temperature > 120 {
+		return nil, errors.New("いくらなんでもしんでしまいます")
+	}
+
+	if water < 0 || water > 25 {
+		return nil, errors.New("いくらなんでも水風呂の意味なさ過ぎます")
+	}
+
+	return &SaunaInfo{
+		Temperature:  temperature,
+		Water:        water,
+		HasMeal:      hasMeal,
+		HasRestArea:  hasRestArea,
+		HasSleepRoom: hasSleepRoom,
+	}, nil
 }
