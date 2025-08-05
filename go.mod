@@ -3,11 +3,12 @@ module saunalog
 go 1.23.1
 
 require (
-	github.com/aws/aws-lambda-go v1.49.0 // indirect
-	github.com/aws/aws-sdk-go v1.54.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
-	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/labstack/echo/v4 v4.13.4 // indirect
+	github.com/aws/aws-lambda-go v1.49.0
+	github.com/google/uuid v1.6.0
+	github.com/labstack/echo/v4 v4.13.4
+)
+
+require (
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
