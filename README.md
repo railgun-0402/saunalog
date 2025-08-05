@@ -24,3 +24,11 @@
 | 認証     | Cognito                   |
 | インフラ   | AWS + Terraform                      |
 | 監視     | NewRelic（APM、ログ、外形監視）                |
+
+## Labmdaへデプロイ(最終的にはTerraformでIaC化)
+```
+cd lambda/compress_image
+
+GOOS=linux GOARCH=amd64 go build -o bootstrap main.go
+zip function.zip bootstrap
+```
