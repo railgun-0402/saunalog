@@ -37,6 +37,7 @@ func HandleRequest(ctx context.Context, event events.S3Event) error {
 
 		input := map[string]string{
 			"fileName": key,
+			"bucket":   s3.Bucket.Name,
 		}
 		inputJSON, _ := json.Marshal(input)
 
