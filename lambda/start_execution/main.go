@@ -35,9 +35,15 @@ func HandleRequest(ctx context.Context, event events.S3Event) error {
 			key = rawKey
 		}
 
-		input := map[string]string{
-			"fileName": key,
-			"bucket":   s3.Bucket.Name,
+		// S3 Bucketは共通だが、ファイルは名前も拡張子もバラバラなのでinterfaceを使用
+		input := map[string]interface{}{
+			"bucket": s3.Bucket.Name,
+			// 複数ファイルに対応できるよう、マップ配列を使用
+			"files": []map[string]string{
+				{
+					"fileName": key,
+				},
+			},
 		}
 		inputJSON, _ := json.Marshal(input)
 
