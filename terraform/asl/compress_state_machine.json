@@ -1,0 +1,11 @@
+{
+  "Comment": "Minimal test state machine",
+  "StartAt": "HelloWorld",
+  "States": {
+    "HelloWorld": {
+      "Type": "Pass",
+      "Result": "Hello from Step Functions",
+      "End": true
+    }
+  }
+}
