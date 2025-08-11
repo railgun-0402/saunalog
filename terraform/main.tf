@@ -44,3 +44,53 @@ resource "aws_lambda_function" "compress_image2" {
     }
   }
 }
+
+// Step Functions
+resource "aws_sfn_state_machine" "media_pipeline" {
+  name = "saunalog-media-pipeline"
+  role_arn = aws_iam_role.stepfn_role.arn
+
+  definition =templatefile("${path.module}/asl/compress_state_machine.json", {
+    compress_image_lambda_arn = aws_lambda_function.compress_image2.arn
+  })
+
+  logging_configuration {
+    level = "ALL"
+    include_execution_data = true
+    log_destination        = "${aws_cloudwatch_log_group.stepfn_logs.arn}:*"
+  }
+
+  depends_on = [
+    aws_cloudwatch_log_group.stepfn_logs,
+    aws_iam_role_policy.stepfn_logs_policy
+  ]
+}
+
+// CloudWatch
+resource "aws_cloudwatch_log_group" "stepfn_logs" {
+  name              = "/aws/vendedlogs/states/saunalog-media-pipeline"
+  retention_in_days = 14
+}
+
+resource "aws_iam_role_policy" "stepfn_logs_policy" {
+  role = aws_iam_role.stepfn_role.id
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect: "Allow",
+        Action: [
+          "logs:CreateLogDelivery",
+          "logs:GetLogDelivery",
+          "logs:UpdateLogDelivery",
+          "logs:DeleteLogDelivery",
+          "logs:ListLogDeliveries",
+          "logs:PutResourcePolicy",
+          "logs:DescribeResourcePolicies",
+          "logs:DescribeLogGroups"
+        ],
+        Resource: "*"
+      }
+    ]
+  })
+}
