@@ -2,6 +2,8 @@ package domain
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -19,10 +21,23 @@ type User struct {
 }
 
 func NewUser(id UserID, name, gender, password, email string, age int, prefecture string) (*User, error) {
-	// TODO: 追加データの内容を入れる
-	// nameとageは必須入力
-	if name == "" || gender == "" {
-		return nil, errors.New("名前・性別は必須です")
+	var missingFields []string
+
+	if name == "" {
+		missingFields = append(missingFields, "名前")
+	}
+	if gender == "" {
+		missingFields = append(missingFields, "性別")
+	}
+	if email == "" {
+		missingFields = append(missingFields, "メールアドレス")
+	}
+	if prefecture == "" {
+		missingFields = append(missingFields, "都道府県")
+	}
+	// バリデーションチェックを複数でまとめ
+	if len(missingFields) > 0 {
+		return nil, fmt.Errorf("%s は必須です", strings.Join(missingFields, "・"))
 	}
 
 	if age < 0 {
