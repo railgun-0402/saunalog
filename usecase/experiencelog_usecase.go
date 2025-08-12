@@ -18,5 +18,6 @@ func NewExperienceLogUseCase() ExperienceLogUseCase {
 
 func (u *experienceLogUsecaseImpl) CreateExperienceLog(ctx context.Context, log *domain.ExperienceLog) error {
 	// TODO: DB Impl
+	// TODO: Transfer Impl File to Repository
 	return nil
 }
