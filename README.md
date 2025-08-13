@@ -32,3 +32,30 @@ cd lambda/compress_image
 GOOS=linux GOARCH=amd64 go build -o bootstrap main.go
 zip function.zip bootstrap
 ```
+
+### ・experience logs
+
+```Request```
+
+```
+curl -X POST http://localhost:8080/logs \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "u123",
+    "facility_id": "f456",
+    "date": "2025-08-02",
+    "congestion_level": 3,
+    "totonoi_level": 5,
+    "cost_performance": 4,
+    "service_quality": 5,
+    "comment": "キンキン水風呂で昇天しました"
+  }'
+```
+
+```Response```
+
+```
+{
+    "id": 1
+}
+```

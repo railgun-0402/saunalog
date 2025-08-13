@@ -1,4 +1,4 @@
-package infra
+package db
 
 import (
 	"context"
@@ -46,7 +46,7 @@ func (r *userRepo) GetUserByEmail(ctx context.Context, email string) (*domain.Us
 		SELECT id, name, email, gender, age, password, prefecture, created_at
 		FROM users WHERE email = ?
 	`
-	var u domain.User
+	u := domain.User{}
 	err := r.db.QueryRowContext(ctx, query, email).Scan(
 		&u.ID, &u.Name, &u.Email, &u.Gender, &u.Age, &u.Password, &u.Prefecture, &u.CreatedAt,
 	)
