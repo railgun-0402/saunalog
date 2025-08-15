@@ -9,10 +9,13 @@ import (
 	domain "saunalog/domain/user"
 	"saunalog/handler"
 	"saunalog/infra/db"
-	"saunalog/usecase/repository"
-
 	"saunalog/usecase"
 )
+
+type router struct {
+	e *echo.Echo
+	d *db.UserRepo
+}
 
 type Server struct {
 	e     *echo.Echo
@@ -46,16 +49,29 @@ func NewServer(logUC usecase.ExperienceLogUseCase) *Server {
 	}
 }
 
+func NewRouter(d *db.UserRepo) *router {
+	return &router{
+		e: echo.New(),
+		d: d,
+	}
+}
+
 func (s *Server) router() {
 	logHandler := handler.ExperienceLogHandler{
 		Usecase: s.logUC,
 	}
 	s.e.POST("/logs", logHandler.CreateExperienceLog)
+
 }
 
-func (s *Server) Listen(addr string) error {
-	s.router()
-	if err := s.e.Start(addr); err != nil && err != http.ErrServerClosed {
+func (r *router) userRouter() {
+	uc := usecase.NewUserCreate(r.d)
+	r.e.POST("/users", uc.Execute)
+}
+
+func (r *router) Listen(addr string) error {
+	r.userRouter()
+	if err := r.e.Start(addr); err != nil && err != http.ErrServerClosed {
 		return fmt.Errorf("server start: %w", err)
 	}
 	return nil
@@ -69,12 +85,13 @@ func Start() {
 	defer mysql.Close()
 
 	// TODO: APIにする
-	var userRepo repository.UserRepository = db.NewUserRepo(mysql)
+	userRepo := &db.UserRepo{DB: mysql}
 	_ = userRepo
 
-	logUC := usecase.NewExperienceLogUseCase()
+	//logUC := usecase.NewExperienceLogUseCase()
 
-	srv := NewServer(logUC)
+	//srv := NewServer(logUC)
+	srv := NewRouter(userRepo)
 	if err := srv.Listen(":8080"); err != nil {
 		log.Fatalf("listen error: %v", err)
 	}

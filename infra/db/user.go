@@ -9,21 +9,21 @@ import (
 	"saunalog/usecase/repository"
 )
 
-type userRepo struct {
-	db *sql.DB
+type UserRepo struct {
+	DB *sql.DB
 }
 
 func NewUserRepo(db *sql.DB) repository.UserRepository {
-	return &userRepo{db: db}
+	return &UserRepo{DB: db}
 }
 
-func (r *userRepo) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
+func (r *UserRepo) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
 	query := `
 		INSERT INTO users (name, email, gender, age, password, prefecture, created_at)
 		VALUES (?, ?, ?, ?, ?, ?, NOW())
 	`
 
-	res, err := r.db.ExecContext(ctx, query,
+	res, err := r.DB.ExecContext(ctx, query,
 		user.Name, user.Email, user.Gender, user.Age, user.Password, user.Prefecture,
 	)
 	if err != nil {
@@ -41,13 +41,13 @@ func (r *userRepo) CreateUser(ctx context.Context, user *domain.User) (*domain.U
 	return user, nil
 }
 
-func (r *userRepo) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
+func (r *UserRepo) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
 	query := `
 		SELECT id, name, email, gender, age, password, prefecture, created_at
 		FROM users WHERE email = ?
 	`
 	u := domain.User{}
-	err := r.db.QueryRowContext(ctx, query, email).Scan(
+	err := r.DB.QueryRowContext(ctx, query, email).Scan(
 		&u.ID, &u.Name, &u.Email, &u.Gender, &u.Age, &u.Password, &u.Prefecture, &u.CreatedAt,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
