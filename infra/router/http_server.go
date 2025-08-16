@@ -1,99 +1,64 @@
 package router
 
 import (
-	"context"
+	"database/sql"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"log"
 	"net/http"
-	domain "saunalog/domain/user"
 	"saunalog/handler"
 	"saunalog/infra/db"
 	"saunalog/usecase"
 )
 
-type router struct {
-	e *echo.Echo
-	d *db.UserRepo
+type AppDB struct {
+	DB *sql.DB
 }
 
-type Server struct {
-	e     *echo.Echo
-	logUC usecase.ExperienceLogUseCase
-}
+func Router(e *echo.Echo, apps AppDB) {
+	api := e.Group("/api")
+	v1 := api.Group("/v1")
 
-// TODO: APIにする
-func tryUserCreate() {
-	userRepo := db.NewUserRepo(db.Conn)
-
-	u := &domain.User{
-		Name:       "テスト太郎",
-		Email:      "test@example.com",
-		Gender:     "male",
-		Age:        28,
-		Password:   "hashed-password",
-		Prefecture: "Tokyo",
+	{
+		userRepo := db.NewUserRepo(apps.DB)
+		userUC := usecase.NewUserCreate(userRepo)
+		userHandler := handler.UserHandler{
+			Usecase: userUC,
+		}
+		v1.POST("/users", userHandler.CreateUser)
 	}
 
-	newUser, err := userRepo.CreateUser(context.Background(), u)
-	if err != nil {
-		panic(err)
+	{
+		logUC := usecase.NewExperienceLogUseCase()
+		logHandler := handler.ExperienceLogHandler{
+			Usecase: logUC,
+		}
+		v1.POST("/logs", logHandler.CreateExperienceLog)
 	}
-	fmt.Printf("Created User: &+\n", newUser)
-}
-
-func NewServer(logUC usecase.ExperienceLogUseCase) *Server {
-	return &Server{
-		e:     echo.New(),
-		logUC: logUC,
-	}
-}
-
-func NewRouter(d *db.UserRepo) *router {
-	return &router{
-		e: echo.New(),
-		d: d,
-	}
-}
-
-func (s *Server) router() {
-	logHandler := handler.ExperienceLogHandler{
-		Usecase: s.logUC,
-	}
-	s.e.POST("/logs", logHandler.CreateExperienceLog)
 
 }
 
-func (r *router) userRouter() {
-	uc := usecase.NewUserCreate(r.d)
-	r.e.POST("/users", uc.Execute)
-}
-
-func (r *router) Listen(addr string) error {
-	r.userRouter()
-	if err := r.e.Start(addr); err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("server start: %w", err)
-	}
-	return nil
-}
-
-func Start() {
+func Listen(addr string) error {
 	mysql, err := db.NewMySQLFromEnv()
 	if err != nil {
 		log.Fatalf("db connect error: %v", err)
 	}
 	defer mysql.Close()
 
-	// TODO: APIにする
-	userRepo := &db.UserRepo{DB: mysql}
-	_ = userRepo
+	e := echo.New()
+	e.Use(middleware.Logger(), middleware.Recover())
 
-	//logUC := usecase.NewExperienceLogUseCase()
+	Router(e, AppDB{DB: mysql})
 
-	//srv := NewServer(logUC)
-	srv := NewRouter(userRepo)
-	if err := srv.Listen(":8080"); err != nil {
+	if err := e.Start(addr); err != nil && err != http.ErrServerClosed {
+		return fmt.Errorf("server start: %w", err)
+	}
+	return nil
+}
+
+func Start() {
+	if err := Listen(":8080"); err != nil {
 		log.Fatalf("listen error: %v", err)
 	}
-
 }

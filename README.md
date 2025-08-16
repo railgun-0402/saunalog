@@ -61,3 +61,29 @@ curl -X POST http://localhost:8080/logs \
     "id": 1
 }
 ```
+
+### ・users
+
+```Request```
+
+```
+curl -X POST http://localhost:8080/api/v1/users \                                                                                            ok | 18s | 23:14:29 
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "サウナ太郎",
+    "email": "sauna@example.com",
+    "password": "sauna-password",
+    "gender": "male",
+    "age": 30,
+    "prefecture": "Tokyo"
+  }'
+```
+
+```Response```
+
+```
+{
+    "id": 1,
+    "message": "ユーザーの新規作成に成功しました"
+}
+```

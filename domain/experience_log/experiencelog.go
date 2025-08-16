@@ -3,7 +3,6 @@ package domain
 import (
 	"errors"
 	domain "saunalog/domain/facility"
-	user "saunalog/domain/user"
 	"time"
 )
 
@@ -11,7 +10,7 @@ type ExperienceID string
 
 type ExperienceLog struct {
 	ID              ExperienceID
-	UserID          user.UserID
+	UserID          string
 	SaunaFacilityID domain.SaunaFacilityID
 	Date            time.Time
 	CongestionLevel int // 1〜5(混雑)

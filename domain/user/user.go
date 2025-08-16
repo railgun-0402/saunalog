@@ -1,4 +1,4 @@
-package domain
+package user
 
 import (
 	"errors"
@@ -7,10 +7,8 @@ import (
 	"time"
 )
 
-type UserID string
-
 type User struct {
-	ID         UserID
+	ID         string
 	Name       string
 	Email      string // Unique
 	Password   string // Hash
@@ -20,19 +18,19 @@ type User struct {
 	CreatedAt  time.Time
 }
 
-func NewUser(id UserID, name, gender, password, email string, age int, prefecture string) (*User, error) {
+func NewUser(params User) (*User, error) {
 	var missingFields []string
 
-	if name == "" {
+	if params.Name == "" {
 		missingFields = append(missingFields, "名前")
 	}
-	if gender == "" {
+	if params.Gender == "" {
 		missingFields = append(missingFields, "性別")
 	}
-	if email == "" {
+	if params.Email == "" {
 		missingFields = append(missingFields, "メールアドレス")
 	}
-	if prefecture == "" {
+	if params.Prefecture == "" {
 		missingFields = append(missingFields, "都道府県")
 	}
 	// バリデーションチェックを複数でまとめ
@@ -40,18 +38,18 @@ func NewUser(id UserID, name, gender, password, email string, age int, prefectur
 		return nil, fmt.Errorf("%s は必須です", strings.Join(missingFields, "・"))
 	}
 
-	if age < 0 {
+	if params.Age < 0 {
 		return nil, errors.New("年齢は0以上で設定してください")
 	}
 
 	return &User{
-		ID:         id,
-		Name:       name,
-		Email:      email,
-		Password:   password,
-		Gender:     gender,
-		Age:        age,
-		Prefecture: prefecture,
+		ID:         params.ID,
+		Name:       params.Name,
+		Email:      params.Email,
+		Password:   params.Password,
+		Gender:     params.Gender,
+		Age:        params.Age,
+		Prefecture: params.Prefecture,
 		CreatedAt:  time.Now(),
 	}, nil
 }
