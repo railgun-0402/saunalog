@@ -6,8 +6,6 @@ import (
 	"net/http"
 	domain "saunalog/domain/experience_log"
 	facility "saunalog/domain/facility"
-	user "saunalog/domain/user"
-
 	"saunalog/usecase"
 	"time"
 )
@@ -44,7 +42,7 @@ func (h *ExperienceLogHandler) CreateExperienceLog(c echo.Context) error {
 	}
 
 	logID := domain.ExperienceID(uuid.New().String())
-	userID := user.UserID(req.UserID)
+	userID := req.UserID
 	facilityID := facility.SaunaFacilityID(req.FacilityID)
 
 	log, err := domain.NewExperienceLog(domain.ExperienceLog{

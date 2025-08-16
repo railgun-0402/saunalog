@@ -6,15 +6,14 @@ import (
 	"errors"
 	"fmt"
 	domain "saunalog/domain/user"
-	"saunalog/usecase/repository"
 )
 
 type UserRepo struct {
-	DB *sql.DB
+	db *sql.DB
 }
 
-func NewUserRepo(db *sql.DB) repository.UserRepository {
-	return &UserRepo{DB: db}
+func NewUserRepo(db *sql.DB) *UserRepo {
+	return &UserRepo{db: db}
 }
 
 func (r *UserRepo) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
@@ -23,7 +22,7 @@ func (r *UserRepo) CreateUser(ctx context.Context, user *domain.User) (*domain.U
 		VALUES (?, ?, ?, ?, ?, ?, NOW())
 	`
 
-	res, err := r.DB.ExecContext(ctx, query,
+	res, err := r.db.ExecContext(ctx, query,
 		user.Name, user.Email, user.Gender, user.Age, user.Password, user.Prefecture,
 	)
 	if err != nil {
@@ -36,7 +35,7 @@ func (r *UserRepo) CreateUser(ctx context.Context, user *domain.User) (*domain.U
 		fmt.Println(err)
 		return nil, err
 	}
-	user.ID = domain.UserID(id)
+	user.ID = string(id)
 
 	return user, nil
 }
@@ -47,7 +46,7 @@ func (r *UserRepo) GetUserByEmail(ctx context.Context, email string) (*domain.Us
 		FROM users WHERE email = ?
 	`
 	u := domain.User{}
-	err := r.DB.QueryRowContext(ctx, query, email).Scan(
+	err := r.db.QueryRowContext(ctx, query, email).Scan(
 		&u.ID, &u.Name, &u.Email, &u.Gender, &u.Age, &u.Password, &u.Prefecture, &u.CreatedAt,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
