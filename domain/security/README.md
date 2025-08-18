@@ -8,8 +8,11 @@ Web（SPA/SSR）・モバイル/WebView どちらも視野に入れて設計す�
 - Access: JWT（5–15 分）… API 認可用。サーバー側で stateless 検証
 - Refresh: ランダム ID（JTI）を DB で管理（7–30 日）… ローテーション＆失効可能
 
-### Web: Cookie（HttpOnly/Secure/SameSite）で配布
-### モバイル/ネイティブ: ```Authorization: Bearer``` ヘッダーで配布。
+### Web: Cookie
+- （HttpOnly/Secure/SameSite）で配布
+
+### モバイル/ネイティブ: 
+- ```Authorization: Bearer``` ヘッダーで配布。
 
 > Cookie セッション方式も選べるが、モバイル/サービス横断を考慮し JWT 方式を第一候補
 
