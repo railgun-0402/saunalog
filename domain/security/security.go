@@ -3,10 +3,10 @@ package security
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"errors"
 	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -20,7 +20,17 @@ const (
 	TokenKindRefresh = TokenKind("refresh")
 )
 
-var secret = []byte(os.Getenv("JWT_SECRET_KEY"))
+var (
+	secret     []byte
+	secretOnce sync.Once
+)
+
+func GetSecret() []byte {
+	secretOnce.Do(func() {
+		secret = []byte(os.Getenv("JWT_SECRET_KEY"))
+	})
+	return secret
+}
 
 type Claims struct {
 	Kind TokenKind `json:"kind"`
@@ -37,9 +47,6 @@ func newJTI() (string, error) {
 }
 
 func GenerateJWT(userID uint, role string, ttl time.Duration, kind TokenKind, audience ...string) (string, time.Time, error) {
-	if len(secret) == 0 {
-		return "", time.Time{}, errors.New("JWT secret not configured")
-	}
 	now := time.Now()
 	exp := now.Add(ttl)
 	jti, err := newJTI()
@@ -49,6 +56,7 @@ func GenerateJWT(userID uint, role string, ttl time.Duration, kind TokenKind, au
 
 	sub := strconv.FormatUint(uint64(userID), 10)
 
+	// Create payload
 	claims := &Claims{
 		Kind: kind,
 		Role: role,
@@ -66,10 +74,12 @@ func GenerateJWT(userID uint, role string, ttl time.Duration, kind TokenKind, au
 	// Create token And sign
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	// Change Token To Strings
-	tokenString, err := token.SignedString(secret)
+	// Signature
+	tokenString, err := token.SignedString(GetSecret())
 	return tokenString, exp, err
 }
+
+// TODO: Error Handle
 
 // How To Use
 // Access 15Min, Refresh 14Days
