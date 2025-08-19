@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	domain "saunalog/domain/user"
+	"strconv"
 )
 
 type UserRepo struct {
@@ -35,7 +36,7 @@ func (r *UserRepo) CreateUser(ctx context.Context, user *domain.User) (*domain.U
 		fmt.Println(err)
 		return nil, err
 	}
-	user.ID = string(id)
+	user.ID = strconv.FormatInt(id, 10)
 
 	return user, nil
 }
