@@ -34,7 +34,7 @@ func GetSecret() []byte {
 
 type Claims struct {
 	Kind TokenKind `json:"kind"`
-	Role string    `json:"role, omitempty`
+	Role string    `json:"role,omitempty"`
 	jwt.RegisteredClaims
 }
 
