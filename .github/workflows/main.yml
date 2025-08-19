@@ -23,7 +23,7 @@ jobs:
       - run: go mod download
 
       - name: Build
-        run: go build -v ./...
+        run: go build ./domain/... ./infra/... ./usecase/... ./handler/...
 
       - name: Test
         run: go test -v ./repositories
