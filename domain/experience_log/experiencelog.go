@@ -37,7 +37,7 @@ func NewExperienceLog(params ExperienceLog) (*ExperienceLog, error) {
 		ID:              params.ID,
 		UserID:          params.UserID,
 		SaunaFacilityID: params.SaunaFacilityID,
-		Date:            time.Now(),
+		Date:            params.Date,
 		CongestionLevel: params.CongestionLevel,
 		CostPerformance: params.CostPerformance,
 		TotonoiLevel:    params.TotonoiLevel,
